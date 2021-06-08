@@ -9,9 +9,21 @@
 		<meta name="author"      content="James Boehme"/>
 		<meta name="viewport"    content="width=device-width, initial-scale=1.0"/>
 		
-		<link type="text/css" rel="stylesheet" href="style.css"/>
 		<script type="text/javascript" defer src="pixi.min.js"></script>
+		<script type="text/javascript" defer src="pixi-filters.js"></script>
+		<script type="text/javascript" defer src="pixi-tiledmap.min.js"></script>
 		<script type="text/javascript" defer src="script.js"></script>
+
+		<style>
+			/* Clean pixels for every element. */
+			* {
+				image-rendering:        pixelated !important;
+				image-rendering:        -moz-crisp-edges !important;
+				image-rendering:        crisp-edges !important;
+				image-rendering:        -o-pixelated !important;
+				-ms-interpolation-mode: nearest-neighbor !important;
+			}
+		</style>
 	</head>
 
 	<body style="background-color: maroon;">
