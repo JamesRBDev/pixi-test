@@ -83,7 +83,7 @@ class Renderer {
 		}
 	}
 
-	light(x, y, radius, blur, callback) {
+	light(x, y, radius, blur, callback) { // TODO Improve upon lighting.
 		let circle = new PIXI.Graphics().beginFill(0xff0000).drawEllipse(radius + blur, (radius / 2) + blur, radius, radius / 2).endFill();
 		circle.filters = [new PIXI.filters.BlurFilter(blur)];
 
@@ -115,10 +115,9 @@ class Map extends Renderer {
 				}
 			}
 
+			this.entity("img/tokens/character.png", 0, 2, 2, 4);
 			this.wall(3, 0, 3, 4);
-			this.wall(0, 0, 4, 4);
-			this.wall(0, 0, 5, 4);
-			this.light(128, 64, 28, 42);
+			//this.light(128, 64, 28, 42);
 		});
 	}
 
@@ -131,19 +130,19 @@ class Map extends Renderer {
 		return {"x": x + startX, "y": y};
 	}
 
-	down(x, y) {
+	tileDown(x, y) {
 		
 	}
 
-	up(x, y) {
+	tileUp(x, y) {
 		
 	}
 
-	hover(x, y) {
+	tileEnter(x, y) {
 		
 	}
 
-	unhover(x, y) {
+	tileLeave(x, y) {
 		
 	}
 
@@ -154,14 +153,22 @@ class Map extends Renderer {
 			sprite.interactive = true;
 
 			// Pointer events.
-			sprite.on('pointerdown', () => this.down(posX, posY)).on('pointerup', () => this.down(posX, posY)).on('pointerover', () => this.hover(posX, posY)).on('pointerout', () => this.unhover(posX, posY));
+			sprite.on('pointerdown', () => this.tileDown(posX, posY)).on('pointerup', () => this.tileDown(posX, posY)).on('pointerover', () => this.tileEnter(posX, posY)).on('pointerout', () => this.tileLeave(posX, posY));
 		});
 	}
 
 	wall(spriteX, spriteY, posX, posY) {
 		let coords = this.gridToScreen(posX, posY);
-		this.sprite("img/world/wall.png", {x1: spriteX * 32, y1: spriteY * 64, x2: 32, y2: 64, x: coords.x, y: coords.y - 48, layer: "tile", contain: true}, sprite => {
+		this.sprite("img/world/wall.png", {x1: spriteX * 32, y1: spriteY * 64, x2: 32, y2: 64, x: coords.x, y: coords.y - 48, z: coords.x + coords.y, layer: "tile", contain: true}, sprite => {
 			
+		});
+	}
+
+	entity(url, spriteX, spriteY, posX, posY) {
+		let coords = this.gridToScreen(posX, posY);
+		this.sprite(url, {x1: spriteX * 64, y1: spriteY * 64, x2: 64, y2: 64, x: coords.x - 16, y: coords.y - 32, layer: "tile", contain: true}, sprite => {
+			// Opt-in to interactivity.
+			sprite.interactive = true;
 		});
 	}
 }
