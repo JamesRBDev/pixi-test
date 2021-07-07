@@ -18,9 +18,9 @@ class Renderer {
 
 		// NOTE Remove this block later on.
 		this.app.view.style.transform = "scale(2)";
-		this.app.view.style.position = "absolute";
-		this.app.view.style.left     = "256px";
-		this.app.view.style.top      = "256px";
+		this.app.view.style.position  = "absolute";
+		this.app.view.style.left      = "256px";
+		this.app.view.style.top       = "256px";
 
 		appendTo.appendChild(this.app.view);
 
@@ -87,7 +87,7 @@ class Renderer {
 		}
 	}
 
-	light(x, y, radius, blur, callback) { // TODO Improve upon lighting.
+	light(x, y, radius, blur) { // TODO Improve upon lighting.
 		let circle = new PIXI.Graphics().beginFill(0xff0000).drawEllipse(radius + blur, (radius / 2) + blur, radius, radius / 2).endFill();
 		circle.filters = [new PIXI.filters.BlurFilter(blur)];
 
@@ -123,7 +123,7 @@ class Map extends Renderer {
 			}
 		}
 
-		this.loader.load((loader, resources) => { // NOTE Everything in here is temporary.
+		this.loader.load((loader, resources) => { // NOTE Everything in this block is temporary.
 			for (let y = 0; y < 8; ++y) {
 				for (let x = 0; x < 8; ++x) {
 					this.tile(2, 0, x, y);
@@ -165,7 +165,7 @@ class Map extends Renderer {
 		this.map[y][x].sprites.tile.tint = 0xffffff;
 	}
 
-	tile(spriteX, spriteY, posX, posY) { // (number, number, number, number)
+	tile(spriteX, spriteY, posX, posY, callback) { // (number, number, number, number, function)
 		let coords = this.gridToScreen(posX, posY);
 		this.sprite("img/world/tile.png", {x1: spriteX * 32, y1: spriteY * 32, x2: 32, y2: 32, x: coords.x, y: coords.y, z: (posY * this.y) + posX, layer: "tile"}, sprite => {
 			// Opt-in to interactivity.
@@ -179,18 +179,18 @@ class Map extends Renderer {
 			// Pointer events.
 			sprite.on('pointerdown', () => this.tileDown(posX, posY)).on('pointerup', () => this.tileDown(posX, posY)).on('pointerover', () => this.tileEnter(posX, posY)).on('pointerout', () => this.tileLeave(posX, posY));
 
-			
+			callback(sprite);
 		});
 	}
 
-	wall(spriteX, spriteY, posX, posY) { // (number, number, number, number)
+	wall(spriteX, spriteY, posX, posY, callback) { // (number, number, number, number, function)
 		let coords = this.gridToScreen(posX, posY);
 		this.sprite("img/world/wall.png", {x1: spriteX * 32, y1: spriteY * 64, x2: 32, y2: 64, x: coords.x, y: coords.y - 48, z: (posY * this.y) + posX + 2, layer: "tile", contain: true}, sprite => {
-			
+			callback(sprite);
 		});
 	}
 
-	entity(url, spriteX, spriteY, posX, posY, polygons) { // (string, number, number, number, number, object)
+	entity(url, spriteX, spriteY, posX, posY, polygons, callback) { // (string, number, number, number, number, object, function)
 		let coords = this.gridToScreen(posX, posY);
 		this.sprite(url, {x1: spriteX * 64, y1: spriteY * 64, x2: 64, y2: 64, x: coords.x - 16, y: coords.y - 32, z: (posY * this.y) + posX + 1, layer: "tile", contain: true}, sprite => {
 			// Opt-in to interactivity.
@@ -208,6 +208,8 @@ class Map extends Renderer {
 					sprite.children[i].tint = 0xffffff;
 				}
 			});
+
+			callback(sprite);
 		});
 	}
 }
